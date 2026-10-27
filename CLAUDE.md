@@ -6,13 +6,13 @@ Repo ของสกิล `thai-humanizer` (https://github.com/owh-hwo/thai-hum
 
 | ไฟล์ | หน้าที่ |
 |---|---|
-| `skills/thai-humanizer/SKILL.md` | ทางเข้า เลือกเส้นทางตามภาษา (ไทย → references ไทย + สคริปต์; อังกฤษ → `humanizer-en.md`) มี `version` ใน frontmatter |
-| `references/thai-prose-patterns.md` | "ให้เขียนอย่างไร" ใช้ตอนร่าง: หลักใหญ่ 5 ข้อ, แม่แบบย่อหน้า ก-ญ (ทางเลือก), คลังคำเชื่อม, ตาราง calque (จุดตรวจ ไม่ใช่คู่คำแทน), กลไกภาษาไทยที่ห้ามแก้แบบเหมารวม, ตารางวิชาการ/ทั่วไป |
+| `skills/thai-humanizer/SKILL.md` | ทางเข้า เลือกเส้นทางตามภาษา (ไทย → references ไทย + สคริปต์; อังกฤษ → `humanizer-en.md`) ขั้น 0 เดาประเภทงาน ถ้าเดาไม่ได้ถามผู้ใช้รอบเดียวไม่เกิน 3 ข้อ (ไม่ถามในโหมดฝัง) มี `version` ใน frontmatter |
+| `references/thai-prose-patterns.md` | "ให้เขียนอย่างไร" ใช้ตอนร่าง: หลักใหญ่ 5 ข้อ, แม่แบบย่อหน้า ก-ญ (ทางเลือก), คลังคำเชื่อม, ตาราง calque (จุดตรวจ ไม่ใช่คู่คำแทน), กลไกภาษาไทยที่ห้ามแก้แบบเหมารวม, ตารางวิชาการ/ทั่วไป, โปรไฟล์ย่อย บทความเว็บ/จดหมายตอบ/แชต |
 | `references/thai-humanizer.md` | "อย่าเขียนอย่างไร" ใช้หลังร่าง: ชุด ก ร่องรอยระดับความหมาย (regex จับไม่ได้), ชุด ข ร่องรอยระดับคำ, ชุด ค สำนวนแปล, ข้อควรระวังตอนแก้ |
 | `references/humanizer-en.md` | Humanizer อังกฤษของ Siqi Chen (blader/humanizer) คัดลอกทั้งไฟล์ตามเวอร์ชันในหัวไฟล์ **ห้ามแก้เนื้อหา** อัปเดตโดยคัดลอก SKILL.md รุ่นใหม่จากต้นทาง ตัด frontmatter ใส่หัว comment เดิม ต้องคู่กับ `LICENSE-humanizer` (MIT) เสมอ |
-| `scripts/thai_style_check.py` | นับร่องรอยต่อ 1,000 คำพร้อมเลขบรรทัด ข้าม `[ตัวบท]` และข้อความในเครื่องหมายคำพูด `--genre academic\|general\|auto` (general ปิดการเตือนเฉพาะวิชาการ: บูลเล็ต, "มัน", จุดยืนผู้เขียน) จุดยืนผู้เขียน, คู่ตรงข้าม "ไม่ใช่ X แต่ Y", ความยาวประโยค เป็น INFO เท่านั้น |
+| `scripts/thai_style_check.py` | นับร่องรอยต่อ 1,000 คำพร้อมเลขบรรทัด ข้าม `[ตัวบท]` และข้อความในเครื่องหมายคำพูด `--genre academic\|general\|letter\|chat\|auto` (general ปิดการเตือนเฉพาะวิชาการ: บูลเล็ต, "มัน", จุดยืนผู้เขียน; letter/chat เป็นชื่อแทน general) จุดยืนผู้เขียน, คู่ตรงข้าม "ไม่ใช่ X แต่ Y", ความยาวประโยค เป็น INFO เท่านั้น |
 | `.claude-plugin/` | `plugin.json` + `marketplace.json` (มี `version` ทั้งคู่) ติดตั้ง: `/plugin marketplace add owh-hwo/thai-humanizer` |
-| `tests/` | `ai_sample.md` ต้อง WARN หลายรายการ; `human_sample.md` WARN ≤ 1-2; `general_sample.md` ต้องถูกเดาเป็น general และ WARN 0 |
+| `tests/` | `ai_sample.md` ต้อง WARN หลายรายการ; `human_sample.md` WARN ≤ 1-2; `general_sample.md`, `letter_sample.md`, `chat_sample.md` ต้องถูกเดาเป็น general และ WARN 0 |
 
 ## กติกาเนื้อหา
 
@@ -24,13 +24,13 @@ Repo ของสกิล `thai-humanizer` (https://github.com/owh-hwo/thai-hum
 ## กติกาสคริปต์
 
 - รันได้โดยไม่มี `pythainlp` และบน Windows (stdout ตั้ง utf-8 แล้ว ห้ามพิมพ์อักขระนอก BMP ไทย/ละติน) รันด้วย `python -I`
-- เกณฑ์เตือนเป็นค่าทดลองที่ปรับจากร้อยแก้วคนไทยจริง (เช่น "ถูก" ในบทความตีพิมพ์ราว 4/1,000 คำ) เปลี่ยน threshold หรือเพิ่ม regex ต้องรัน `tests/` ทั้งสามไฟล์ก่อน
+- เกณฑ์เตือนเป็นค่าทดลองที่ปรับจากร้อยแก้วคนไทยจริง (เช่น "ถูก" ในบทความตีพิมพ์ราว 4/1,000 คำ) เปลี่ยน threshold หรือเพิ่ม regex ต้องรัน `tests/` ทุกไฟล์ก่อน
 - regex ใหม่ต้องกันคำไทยปกติ (เคยชน: "น้ำมันทำให้", "ของคุณภาพ", "ภายใต้การดูแล", "พื้นที่ซึ่ง") ถ้ากันไม่ได้ ให้ไว้ในคู่มือเท่านั้น ไม่ใส่สคริปต์
 
 ## ขั้นตอนเมื่อแก้
 
 ```bash
-for f in tests/ai_sample.md tests/human_sample.md tests/general_sample.md; do
+for f in tests/ai_sample.md tests/human_sample.md tests/general_sample.md tests/letter_sample.md tests/chat_sample.md; do
   python -I skills/thai-humanizer/scripts/thai_style_check.py "$f" --top 2
 done
 claude plugin validate .            # ผ่านพร้อม warning เดิม 2 ข้อ (ไม่มี icon, CLAUDE.md ไม่ถูกส่งเป็น context)

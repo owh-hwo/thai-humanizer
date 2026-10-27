@@ -2,7 +2,7 @@
 
 Usage:
   python -I thai_style_check.py draft.md [--top 5] [--json out.json] [--strict]
-                                         [--genre academic|general|auto]
+                                         [--genre academic|general|letter|chat|auto]
 
 What it measures (body text only: frontmatter, headings, tables, images,
 reference sections, [ตัวบท]...[/ตัวบท] blocks and “quoted” text are skipped)
@@ -16,8 +16,9 @@ reference sections, [ตัวบท]...[/ตัวบท] blocks and “quoted�
          long paragraphs without any citation, sentence-length profile
          (needs pythainlp), cliché openings in the introduction
 Genre: --genre academic keeps every check; general skips the academic-only
-checks (stance, bullets/bold, "มัน"); auto (default) guesses from citations
-and section names. Thresholds are trial values tuned on a small sample of
+checks (stance, bullets/bold, "มัน"); letter and chat are aliases of general
+(judge them on raw counts, the text is short); auto (default) guesses from
+citations and section names. Thresholds are trial values tuned on a small sample of
 published Thai journal prose. Numbers call for a human read; they are not
 verdicts. Short texts (an email) should be judged on raw counts, not rates.
 Exit code 1 only with --strict and at least one WARN.
@@ -154,8 +155,8 @@ def main():
     ap.add_argument("--top", type=int, default=5, help="examples to show per finding")
     ap.add_argument("--json")
     ap.add_argument("--strict", action="store_true")
-    ap.add_argument("--genre", choices=["academic", "general", "auto"], default="auto",
-                    help="academic keeps every check; general skips academic-only checks")
+    ap.add_argument("--genre", choices=["academic", "general", "letter", "chat", "auto"], default="auto",
+                    help="academic keeps every check; general (and its aliases letter, chat) skips academic-only checks")
     a = ap.parse_args()
     try:
         sys.stdout.reconfigure(encoding="utf-8")   # Windows consoles default to cp874
@@ -174,6 +175,8 @@ def main():
     verbatim_blocks = len(VERBATIM.findall(text))
     if a.genre == "auto":
         genre, why = guess_genre(cleaned, body)
+    elif a.genre in ("letter", "chat"):
+        genre, why = "general", f"ระบุโดยผู้ใช้ ({a.genre} นับแบบ general ข้อความสั้นให้ดูจำนวนจริง)"
     else:
         genre, why = a.genre, "ระบุโดยผู้ใช้"
     academic = genre == "academic"
