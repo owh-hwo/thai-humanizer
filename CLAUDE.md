@@ -38,7 +38,7 @@ for f in tests/*.md; do
   python -I skills/thai-humanizer/scripts/thai_style_check.py "$f" --top 2
 done
 claude plugin validate .            # ผ่านพร้อม warning เดิม 2 ข้อ (ไม่มี icon, CLAUDE.md ไม่ถูกส่งเป็น context)
-grep -rniE "@gmail|Users/|D:/" --include=*.md --include=*.py --include=*.json . | grep -v "^./.git"   # ต้องว่าง
+grep -rniE "@gmail|Users/|D:/" --include=*.md --include=*.py --include=*.json --exclude=CLAUDE.md .   # ต้องว่าง
 cp -r skills/thai-humanizer ~/.claude/skills/   # เครื่องนี้ใช้สำเนา ไม่ใช่ plugin
 ```
 
