@@ -1,25 +1,27 @@
 # thai-humanizer (สกิลสาธารณะ)
 
-Repo ของสกิล `thai-humanizer` (https://github.com/owh-hwo/thai-humanizer) ปรับข้อความไทย/อังกฤษไม่ให้ดูเป็น AI หรือสำนวนแปล **ทุกอย่างในนี้เผยแพร่สาธารณะ**
+Repo ของสกิล `thai-humanizer` (https://github.com/owh-hwo/thai-humanizer) ปรับข้อความไทย/อังกฤษไม่ให้ดูเป็น AI หรือสำนวนแปล **ทุกอย่างในนี้เผยแพร่สาธารณะ** เวอร์ชันปัจจุบัน 1.2.0
 
-## โครงสร้าง
+## โครงสร้าง (ใต้ `skills/thai-humanizer/` เว้นที่ระบุ)
 
 | ไฟล์ | หน้าที่ |
 |---|---|
-| `skills/thai-humanizer/SKILL.md` | ทางเข้า เลือกเส้นทางตามภาษา (ไทย → references ไทย + สคริปต์; อังกฤษ → `humanizer-en.md`) ขั้น 0 เดาประเภทงาน ถ้าเดาไม่ได้ถามผู้ใช้รอบเดียวไม่เกิน 3 ข้อ (ไม่ถามในโหมดฝัง) มี `version` ใน frontmatter |
+| `SKILL.md` | ทางเข้า เลือกเส้นทางตามภาษา (ไทย → references ไทย + สคริปต์; อังกฤษ → `humanizer-en.md`) ขั้น 0 เดาประเภทงานและผู้อ่าน ถ้าเดาไม่ได้ถามผู้ใช้รอบเดียวไม่เกิน 3 ข้อ มี `version` ใน frontmatter |
 | `references/thai-prose-patterns.md` | "ให้เขียนอย่างไร" ใช้ตอนร่าง: หลักใหญ่ 5 ข้อ, แม่แบบย่อหน้า ก-ญ (ทางเลือก), คลังคำเชื่อม, ตาราง calque (จุดตรวจ ไม่ใช่คู่คำแทน), กลไกภาษาไทยที่ห้ามแก้แบบเหมารวม, ตารางวิชาการ/ทั่วไป, โปรไฟล์ย่อย บทความเว็บ/จดหมายตอบ/แชต |
-| `references/thai-humanizer.md` | "อย่าเขียนอย่างไร" ใช้หลังร่าง: ชุด ก ร่องรอยระดับความหมาย (regex จับไม่ได้), ชุด ข ร่องรอยระดับคำ, ชุด ค สำนวนแปล, ข้อควรระวังตอนแก้ |
-| `references/humanizer-en.md` | Humanizer อังกฤษของ Siqi Chen (blader/humanizer) คัดลอกทั้งไฟล์ตามเวอร์ชันในหัวไฟล์ **ห้ามแก้เนื้อหา** อัปเดตโดยคัดลอก SKILL.md รุ่นใหม่จากต้นทาง ตัด frontmatter ใส่หัว comment เดิม ต้องคู่กับ `LICENSE-humanizer` (MIT) เสมอ |
-| `scripts/thai_style_check.py` | นับร่องรอยต่อ 1,000 คำพร้อมเลขบรรทัด ข้าม `[ตัวบท]` และข้อความในเครื่องหมายคำพูด `--genre academic\|general\|letter\|chat\|auto` (general ปิดการเตือนเฉพาะวิชาการ: บูลเล็ต, "มัน", จุดยืนผู้เขียน; letter/chat เป็นชื่อแทน general) จุดยืนผู้เขียน, คู่ตรงข้าม "ไม่ใช่ X แต่ Y", ความยาวประโยค เป็น INFO เท่านั้น |
-| `.claude-plugin/` | `plugin.json` + `marketplace.json` (มี `version` ทั้งคู่) ติดตั้ง: `/plugin marketplace add owh-hwo/thai-humanizer` |
-| `tests/` | `ai_sample.md` ต้อง WARN หลายรายการ; `human_sample.md` WARN ≤ 1-2; `general_sample.md`, `letter_sample.md`, `chat_sample.md` ต้องถูกเดาเป็น general และ WARN 0 |
+| `references/thai-humanizer.md` | "อย่าเขียนอย่างไร" ใช้หลังร่าง: ชุด ก ร่องรอยระดับความหมาย (regex จับไม่ได้), ชุด ข ระดับคำ, ชุด ค สำนวนแปล, ข้อควรระวังตอนแก้ |
+| `references/humanizer-en.md` | Humanizer อังกฤษของ Siqi Chen (blader/humanizer) คัดลอกทั้งไฟล์ **ห้ามแก้เนื้อหา** อัปเดตโดยคัดลอก SKILL.md รุ่นใหม่จากต้นทาง ตัด frontmatter ใส่หัว comment เดิม ต้องคู่กับ `LICENSE-humanizer` (MIT) เสมอ |
+| `scripts/thai_style_check.py` | นับร่องรอยต่อ 1,000 คำพร้อมเลขบรรทัด ข้าม `[ตัวบท]` และข้อความในเครื่องหมายคำพูด `--genre academic\|general\|letter\|chat\|auto` general ปิดการเตือนเฉพาะวิชาการ (บูลเล็ต, "มัน", จุดยืนผู้เขียน) letter/chat นับแบบ general จุดยืนผู้เขียน, "ไม่ใช่ X แต่ Y", ความยาวประโยค เป็น INFO เท่านั้น |
+| `/.claude-plugin/` | `plugin.json` + `marketplace.json` (มี `version` ทั้งคู่) ติดตั้ง: `/plugin marketplace add owh-hwo/thai-humanizer` |
+| `/tests/` | `ai_sample.md` ต้อง WARN หลายรายการ; `human_sample.md` (วิชาการ) WARN ≤ 1-2; `general_sample.md`, `letter_sample.md`, `chat_sample.md` ต้องถูกเดาเป็น general และ WARN 0 |
 
 ## กติกาเนื้อหา
 
-1. **ห้ามข้อมูลเฉพาะเข้า repo**: ชื่อบทความ/วารสาร/ผู้วิจัยจริง เลขกฎหมาย path ส่วนตัว อีเมล ตัวอย่างต้องแต่งขึ้น ก่อน commit ให้ `grep` หาคำเหล่านี้
+1. **ห้ามข้อมูลเฉพาะเข้า repo**: ชื่อบทความ/วารสาร/ผู้วิจัยจริง เลขกฎหมาย path ส่วนตัว อีเมล ตัวอย่างและชื่อคนในตัวอย่างต้องแต่งขึ้น ก่อน commit ให้ `grep` หาคำเหล่านี้
 2. **คำแนะนำต้องไม่เปลี่ยนความหมายและไม่ซ้ำกับร่องรอยที่ห้าม** ทุกแถวในตาราง calque ต้องบอกเงื่อนไขว่าเมื่อใดคงรูปเดิม เขียนเป็นเงื่อนไขการใช้ ไม่ใช่โควตาตายตัว ("ไม่เกิน 2 ครั้ง/บทความ") เคยพลาด: "ธุรกิจเห็นผลชัดเจน" (ทิ้งสิ่งที่งานวัด), "มีแนวโน้ม→มัก" (ทิศทาง≠ความถี่), "ถูก→ได้รับการ" (กรรมวาจกทั้งคู่), เติม "ทั้งหมด" ให้ฐานร้อยละ, เติม "ทางสถิติ" ที่แหล่งไม่ได้บอก
 3. **ไม่ติดป้ายรูปภาษาไทยปกติว่าเป็นสำนวนแปล** เคยพลาด: "แม้...ก็ตาม แต่", "ให้ความสำคัญกับ", "ประโยชน์ของ X ขึ้นอยู่กับ Y" ร่องรอยใหม่ต้องผ่าน `tests/human_sample.md` และตอบได้ว่าคนไทยที่เขียนเก่งไม่ใช้รูปนี้
-4. **บทเรียนจากงานจริงเขียนเป็นข้อทั่วไป** ลง `thai-humanizer.md` (ข้อควรระวัง) หรือ `thai-prose-patterns.md` (แม่แบบ/คำ) ไม่ใส่ประวัติการแก้บทความใด
+4. **ถามผู้ใช้ให้น้อยที่สุด** ขั้น 0 เดาก่อน ถามเฉพาะเมื่อเดาไม่ได้ รอบเดียว ไม่เกิน 3 ข้อ ไม่ถามเมื่อผู้ใช้ระบุประเภทงานแล้วหรือเมื่อสกิลอื่นเรียก (โหมดฝัง) ไม่พึ่งสกิลภายนอก (เช่น grill-me) เพราะผู้ติดตั้งจาก marketplace ไม่มี
+5. **ประเภทงานใหม่** (เช่น ประกาศ รายงานประชุม) ต้องเพิ่มครบ 4 จุด: ตัวเลือกในขั้น 0 ของ `SKILL.md`, คอลัมน์ในตารางโปรไฟล์ย่อยท้าย `thai-prose-patterns.md`, ชื่อแทน `--genre` ในสคริปต์ (ถ้าไม่ต้องการเกณฑ์ใหม่ให้แมปเป็น general), และไฟล์ตัวอย่างใน `tests/` ที่ต้อง WARN 0
+6. **บทเรียนจากงานจริงเขียนเป็นข้อทั่วไป** ลง `thai-humanizer.md` (ข้อควรระวัง) หรือ `thai-prose-patterns.md` (แม่แบบ/คำ) ไม่ใส่ประวัติการแก้บทความใด
 
 ## กติกาสคริปต์
 
@@ -29,19 +31,22 @@ Repo ของสกิล `thai-humanizer` (https://github.com/owh-hwo/thai-hum
 
 ## ขั้นตอนเมื่อแก้
 
+แก้ข้อความไทยในไฟล์ด้วยสคริปต์ Python ที่อ่าน/เขียน utf-8 หรือเครื่องมือแก้ไฟล์ของ Claude ไม่ใช้ heredoc/sed ใน Git Bash บน Windows (เสี่ยงเพี้ยนรหัสอักขระ) repo ตั้ง `core.autocrlf=true` คำเตือน LF→CRLF ตอน `git add` ไม่ต้องสนใจ
+
 ```bash
-for f in tests/ai_sample.md tests/human_sample.md tests/general_sample.md tests/letter_sample.md tests/chat_sample.md; do
+for f in tests/*.md; do
   python -I skills/thai-humanizer/scripts/thai_style_check.py "$f" --top 2
 done
 claude plugin validate .            # ผ่านพร้อม warning เดิม 2 ข้อ (ไม่มี icon, CLAUDE.md ไม่ถูกส่งเป็น context)
+grep -rniE "@gmail|Users/|D:/" --include=*.md --include=*.py --include=*.json . | grep -v "^./.git"   # ต้องว่าง
 cp -r skills/thai-humanizer ~/.claude/skills/   # เครื่องนี้ใช้สำเนา ไม่ใช่ plugin
 ```
 
-เปลี่ยนพฤติกรรม → bump `version` ทั้งสามจุด (SKILL.md, plugin.json, marketplace.json) → commit และ push ที่ `main` เครื่องอื่นอัปเดตด้วย `/plugin marketplace update thai-humanizer`
+เปลี่ยนพฤติกรรม → bump `version` ทั้งสามจุด (SKILL.md, plugin.json, marketplace.json) และบรรทัดแรกของไฟล์นี้ → commit และ push ที่ `main` เครื่องอื่นอัปเดตด้วย `/plugin marketplace update thai-humanizer`
 
 ## วงตรวจสอบด้วยโมเดลอิสระ (ทำล่าสุด 27 ต.ค. 2569, v1.0.0 → 1.1.0)
 
-สคริปต์และการอ่านเองมองไม่เห็นร่องรอยระดับความหมาย (สรุปคมเกินหลักฐาน คำอ้างย้อนกำกวม ระดับภาษาแกว่ง) ให้ codex ตรวจแทน:
+สคริปต์และการอ่านเองมองไม่เห็นร่องรอยระดับความหมาย (สรุปคมเกินหลักฐาน คำอ้างย้อนกำกวม ระดับภาษาแกว่ง) ให้ codex ตรวจแทน ควรทำซ้ำเมื่อแก้ references มาก หรือเพิ่มประเภทงานใหม่ (v1.2.0 เพิ่มจดหมาย/แชต ยังไม่ได้ผ่านรอบนี้)
 
 1. เขียนบทความทดสอบตามสกิล 2 ชิ้น (วิชาการ + เว็บ ชื่อและตัวเลขแต่งขึ้น) เก็บนอก repo
 2. รันคู่กัน: `codex exec -s read-only --ephemeral -o out.md - < prompt.txt` งานหนึ่งวิจารณ์บทความ อีกงานวิจารณ์ไฟล์สกิลโดยตรง persona "นักภาษาศาสตร์ไทย/บรรณาธิการวารสาร" ขอผลระดับประโยคพร้อมก่อน/หลัง (ราว 10 นาทีต่องาน)
@@ -50,5 +55,5 @@ cp -r skills/thai-humanizer ~/.claude/skills/   # เครื่องนี้
 
 ## ความสัมพันธ์กับสกิลอื่น
 
-- `research-article` (https://github.com/owh-hwo/research-article) เรียกสกิลนี้ในขั้นร่าง ปรับภาษา และตรวจก่อนส่ง ไฟล์ไทยทั้งสามย้ายมาที่นี่ 27 ต.ค. 2569 สกิลนั้นไม่เก็บสำเนาแล้ว
+- `research-article` (https://github.com/owh-hwo/research-article) เรียกสกิลนี้ในขั้นร่าง ปรับภาษา และตรวจก่อนส่ง โดยส่งประเภทงาน (วิชาการ) มาเอง สกิลนี้จึงไม่ถาม ไฟล์ไทยทั้งสามย้ายมาที่นี่ 27 ต.ค. 2569 สกิลนั้นไม่เก็บสำเนาแล้ว
 - `humanizer` ต้นทาง (blader/humanizer) ถ้าติดตั้งไว้ด้วย ทั้งสองทำงานกับอังกฤษเหมือนกัน สกิลนี้แค่รวมไว้ให้ติดตั้งครั้งเดียว
