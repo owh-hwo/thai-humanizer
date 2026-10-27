@@ -1,0 +1,2 @@
+# optional: better word counts and sentence-length profile in thai_style_check.py
+pythainlp>=5.0
