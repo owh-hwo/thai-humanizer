@@ -1,6 +1,6 @@
 {
   "name": "thai-humanizer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Rewrite AI-sounding or translated-sounding Thai (and English) so it reads like the writer, without changing what it says. Thai paragraph templates, calque tables, a style-tell counter, and the bundled English Humanizer.",
   "author": {
     "name": "owh-hwo"

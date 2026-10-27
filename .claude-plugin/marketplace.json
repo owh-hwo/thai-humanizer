@@ -11,7 +11,7 @@
       "name": "thai-humanizer",
       "source": "./",
       "description": "Rewrite AI-sounding or translated-sounding Thai and English so it reads like the writer wrote it.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "category": "writing"
     }
   ]
