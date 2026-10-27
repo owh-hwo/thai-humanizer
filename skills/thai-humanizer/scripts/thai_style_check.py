@@ -10,13 +10,15 @@ reference sections, [ตัวบท]...[/ตัวบท] blocks and “quoted�
   WARN   stock AI phrases per 1,000 words above threshold (inflation, staging,
          closers, calques, vague authority, stacked hedges, assistant leakage)
   WARN   "ซึ่ง" chains, passive "ถูก" density, การ/ความ nominalization chains,
-         "ของ" chains, em dashes, bullets/bold inside academic prose
+         "ของ" chains, em dashes, bold inside academic prose
+  WARN   lists that chop prose (any genre): 3+ "- **label:**" items, 2+ items
+         opening with a connective; academic: items over 200 characters
   WARN   "มีนัยสำคัญ" with no statistical context nearby (ambiguous)
   INFO   author stance present/absent, "ไม่ใช่ X แต่ Y" contrasts to re-check,
          long paragraphs without any citation, sentence-length profile
          (needs pythainlp), cliché openings in the introduction
 Genre: --genre academic keeps every check; general skips the academic-only
-checks (stance, bullets/bold, "มัน"); letter and chat are aliases of general
+checks (stance, long list items, bold in prose, "มัน"); letter and chat are aliases of general
 (judge them on raw counts, the text is short); auto (default) guesses from
 citations and section names. Thresholds are trial values tuned on a small sample of
 published Thai journal prose. Numbers call for a human read; they are not
@@ -61,8 +63,11 @@ NOMINAL = re.compile(r"การ[^\s]{1,14}(?:ใน|ของ|เพื่อ)?
 NOMINAL2 = re.compile(r"การดำเนินการ(?:ใน|เพื่อ)การ|การจัดทำการ|ความ[^\s]{1,10}ความ[^\s]{1,10}ความ")
 OF_CHAIN = re.compile(r"ของ[^\s]{1,25}ของ[^\s]{1,25}ของ")
 DASH = re.compile(r"—|(?<![0-9๐-๙])–(?![0-9๐-๙])")                  # interrupting dashes; keeps 15–20
-BULLET = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+", re.M)
+BULLET = re.compile(r"^(\s*)(?:[-*•]|\d+[.)])\s+")
 BOLD = re.compile(r"\*\*[^*]+\*\*")
+LABEL_ITEM = re.compile(r"^\*\*[^*]{1,40}\*\*\s*[:：]|^\*\*[^*]{1,40}[:：]\*\*")   # "- **หัวข้อ:** ..."
+LINKED_ITEM = re.compile(r"^(?:ดังนั้น|จึง|เพราะ|แต่|อย่างไรก็ตาม|อย่างไรก็ดี|นอกจากนี้|ยิ่งไปกว่านั้น|ด้วยเหตุนี้|ซึ่ง|ส่งผลให้|ในขณะเดียวกัน)")
+LONG_ITEM = 200                                                         # characters: a paragraph behind a bullet
 SIGNIF = re.compile(r"มีนัยสำคัญ")
 STAT_CTX = re.compile(r"ทางสถิติ|p\s*[<=>]|ที่ระดับ|\.0[0-9]+|α|นัยสำคัญทางสถิติ")
 STANCE = re.compile(r"ผู้เขียน(?:เห็นว่า|มีความเห็นว่า|ตั้งข้อสังเกต|เสนอ|อนุมาน|สันนิษฐาน|เห็นต่าง)|ในมุมมองของผู้เขียน|ในทัศนะของผู้เขียน")
@@ -108,6 +113,34 @@ def flush(out, buf, start, section):
         p = " ".join(buf)
         if THAI.search(p):
             out.append((start, section, p))
+
+
+def list_runs(text):
+    """Return (runs, bold_prose_lines). A run is a list of (line_no, depth, item_text);
+    blank lines between bullets stay inside the run, indented lines continue an item."""
+    m = REF_HEAD.search(text)
+    if m:
+        text = text[:m.start()]
+    text = VERBATIM.sub(lambda v: "\n" * v.group(0).count("\n"), text)
+    runs, run, bold = [], [], []
+    for i, line in enumerate(text.split("\n"), 1):
+        s = line.strip()
+        b = BULLET.match(line)
+        if b:
+            run.append([i, len(b.group(1).expandtabs(4)) // 2, line[b.end():].strip()])
+        elif run and s and line[:1].isspace() and not s.startswith("|"):
+            run[-1][2] += " " + s
+        elif not s:
+            continue
+        else:
+            if run:
+                runs.append(run); run = []
+            if not s.startswith(("#", "|", "![")) and THAI.search(s) and BOLD.search(QUOTED.sub(" ", s)):
+                bold.append((i, s[:50]))
+    if run:
+        runs.append(run)
+    runs = [[(ln, d, QUOTED.sub(" ", t)) for ln, d, t in r] for r in runs]
+    return [r for r in runs if THAI.search(" ".join(t for _, _, t in r))], bold
 
 
 def clean(p):
@@ -229,9 +262,27 @@ def main():
         ex = [(ln, ctx(p, m)) for ln, _, p in cleaned for m in r.finditer(p)]
         add("WARN" if len(ex) * per > limit else "INFO", label, len(ex), ex, limit)
 
-    ex = [(ln, p[:50]) for ln, _, p in cleaned if BULLET.match(p) or BOLD.search(p)]
-    add("WARN" if (ex and academic) else "INFO", "บูลเล็ต/ตัวหนาในย่อหน้าร้อยแก้ว", len(ex), ex, None,
-        "" if academic else "(บทความทั่วไป: รายการใช้ได้)")
+    # 3b. lists vs prose (same criterion in every genre; see "รายการหรือร้อยแก้ว")
+    runs, bold_prose = list_runs(text)
+    items = [it for r in runs for it in r]
+    if items:
+        label = [(ln, t[:50]) for ln, _, t in items if LABEL_ITEM.match(t)]
+        add("WARN" if len(label) >= 3 else "INFO", "บูลเล็ตขึ้นต้นด้วยป้ายตัวหนา + ทวิภาค (ตรวจว่าเป็นเหตุผลต่อเนื่องที่ควรเขียนเป็นร้อยแก้วไหม)",
+            len(label), label, None, "รายการขั้นตอน/เกณฑ์ที่ป้ายช่วยหาเจอคงไว้ได้")
+        linked = [(ln, t[:50]) for ln, _, t in items if LINKED_ITEM.match(LABEL_ITEM.sub("", t).strip())]
+        add("WARN" if len(linked) >= 2 else "INFO", "ข้อในรายการขึ้นต้นด้วยคำเชื่อม (ข้อนั้นต่อจากข้อก่อน ควรเป็นร้อยแก้ว)", len(linked), linked)
+        long_ = [(ln, f"{len(t)} อักขระ: {t[:40]}") for ln, _, t in items if len(t) > LONG_ITEM]
+        add("WARN" if (long_ and academic) else "INFO", f"ข้อในรายการยาวเกิน {LONG_ITEM} อักขระ (ย่อหน้าที่ใส่จุดนำหน้า)", len(long_), long_)
+        short = [(r[0][0], r[0][2][:50]) for r in runs
+                 if sum(1 for _, d, _ in r if d == min(d for _, d, _ in r)) <= 2]
+        add("INFO", "รายการ 1-2 ข้อ (เขียนในประโยคได้)", len(short), short)
+        nested = [(ln, t[:50]) for ln, d, t in items if d >= 2]
+        add("INFO", "รายการซ้อนเกินหนึ่งชั้น", len(nested), nested)
+        if academic:
+            add("INFO", "รายการในงานวิชาการ (ตรวจว่าเป็นวัตถุประสงค์ สมมติฐาน เกณฑ์ หรือขั้นตอนวิธี และรูปแบบวารสารรองรับ)",
+                len(runs), [(r[0][0], r[0][2][:50]) for r in runs])
+    add("WARN" if (bold_prose and academic) else "INFO", "ตัวหนาในย่อหน้าร้อยแก้ว", len(bold_prose), bold_prose, None,
+        "" if academic else "(งานทั่วไป: ใช้กับวันที่ จำนวนเงิน สิ่งที่ต้องทำ)")
 
     # 4. significance without statistics
     ex = []
